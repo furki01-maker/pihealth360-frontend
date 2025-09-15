@@ -1,0 +1,4 @@
+[build]
+  base = "."        # Bu klasör root
+  publish = "build" # React build sonrası klasör
+  command = "npm run build"
