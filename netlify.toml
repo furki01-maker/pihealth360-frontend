@@ -1,4 +1,0 @@
-[build]
-  base = "frontend"          # frontend klasörü içinde
-  publish = "frontend/build" # build sonrası klasör
-  command = "npm run build"
