@@ -40,7 +40,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         );
 
         // 3️⃣ Complete payment (opsiyonel: frontend tetikleyebilir)
-        await fetch(${backendUrl}/complete_payment, {
+        await fetch(`${backendUrl}/complete_payment`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ paymentId: data.paymentId, txid: "USER_TX_ID" }),
