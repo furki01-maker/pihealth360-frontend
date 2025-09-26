@@ -20,7 +20,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       const backendUrl = "https://governance-aberdeen-guam-picked.trycloudflare.com";
 
       // 1️⃣ Approve payment
-      const res = await fetch(${backendUrl}/approve_payment, {
+      const res = await fetch(`${backendUrl}/approve_payment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount, receiver, memo }),
