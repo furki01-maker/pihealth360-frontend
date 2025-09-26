@@ -34,7 +34,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         // 2️⃣ Pi Wallet aç
         const payUrl = "https://minepi.com/pay";
         window.open(
-          ${payUrl}/${data.paymentId},
+          `${payUrl}/${data.paymentId}`,
           "_blank",
           "width=500,height=700"
         );
