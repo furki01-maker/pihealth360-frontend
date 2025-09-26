@@ -5,7 +5,7 @@ import App from "./App";
 // globals.d.ts veya index.tsx
 declare global {
   interface Window {
-    Pi?: any;
+    Pi?: any; // opsiyonel yaptık
   }
 }
 
