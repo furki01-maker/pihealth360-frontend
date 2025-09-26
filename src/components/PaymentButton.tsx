@@ -29,7 +29,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       const data = await res.json();
 
       if (data.paymentId) {
-        alert(Payment ID: ${data.paymentId});
+        alert(`Payment ID: ${data.paymentId}`);
 
         // 2️⃣ Pi Wallet aç
         const payUrl = "https://minepi.com/pay";
