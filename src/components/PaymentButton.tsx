@@ -46,7 +46,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           body: JSON.stringify({ paymentId: data.paymentId, txid: "USER_TX_ID" }),
         });
       } else {
-        alert(Hata: ${data.error});
+        alert(`Hata: ${data.error}`);
       }
     } catch (err) {
       alert("Sunucu hatası: " + (err as Error).message);
