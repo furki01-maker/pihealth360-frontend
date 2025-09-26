@@ -69,7 +69,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         cursor: "pointer",
       }}
     >
-      {loading ? "Ödeme İşleniyor..." : Öde ${amount} Pi}
+      {loading ? "Ödeme İşleniyor..." : `Öde ${amount} Pi`}
     </button>
   );
 };
