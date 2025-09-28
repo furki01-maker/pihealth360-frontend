@@ -16,8 +16,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   const startPayment = async () => {
     setLoading(true);
     try {
-      // 🔹 Cloudflared tunnel URL
-      const backendUrl = "https://governance-aberdeen-guam-picked.trycloudflare.com";
+      // 🔹 Backend URL artık production .env üzerinden geliyor
+      const backendUrl = process.env.REACT_APP_BACKEND_URL;
+      if (!backendUrl) throw new Error("Backend URL tanımlı değil!");
 
       // 1️⃣ Approve payment
       const res = await fetch(`${backendUrl}/approve_payment`, {
