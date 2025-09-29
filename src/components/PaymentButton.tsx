@@ -21,7 +21,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       if (!backendUrl) throw new Error("Backend URL tanımlı değil!");
 
       // 1️⃣ Approve payment
-      const res = await fetch(`${backendUrl}/approve_payment`, {
+      const res = await fetch(`${backendUrl}/create-payment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount, receiver, memo }),
