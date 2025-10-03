@@ -1,55 +1,86 @@
+// src/components/PaymentButton.tsx
 import React, { useState } from "react";
 
 interface PaymentButtonProps {
   amount: number;
-  receiver: string;
-  memo?: string;
+  backendUrl: string; // Örn: https://pihealth360-backend-v2.fly.dev
+  receiver?: string;
 }
 
-const PaymentButton: React.FC<PaymentButtonProps> = ({
-  amount,
-  receiver,
-  memo = "Health360+ Payment",
-}) => {
+const PaymentButton: React.FC<PaymentButtonProps> = ({ amount, backendUrl, receiver }) => {
   const [loading, setLoading] = useState(false);
 
   const startPayment = async () => {
     setLoading(true);
     try {
-      // 🔹 Backend URL artık production .env üzerinden geliyor
-      const backendUrl = process.env.REACT_APP_BACKEND_URL;
-      if (!backendUrl) throw new Error("Backend URL tanımlı değil!");
+      if (!(window as any).Pi) {
+        throw new Error("Pi SDK yüklenmemiş. Pi Browser'da açmayı dene.");
+      }
 
-      // 1️⃣ Approve payment
-      const res = await fetch(`${backendUrl}/create-payment`, {
+      // ✅ Kullanıcıyı doğrula ve backend session oluştur
+      const scopes = ["username", "payments"];
+      const authResult = await (window as any).Pi.authenticate(scopes);
+
+      if (!authResult?.accessToken) {
+        alert("Cüzdan bağlantısı alınamadı!");
+        return;
+      }
+
+      const verifyRes = await fetch(`${backendUrl}/api/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount, receiver, memo }),
+        body: JSON.stringify({ accessToken: authResult.accessToken }),
       });
-
-      const data = await res.json();
-
-      if (data.paymentId) {
-        alert(`Payment ID: ${data.paymentId}`);
-
-        // 2️⃣ Pi Wallet aç
-        const payUrl = "https://minepi.com/pay";
-        window.open(
-          `${payUrl}/${data.paymentId}`,
-          "_blank",
-          "width=500,height=700"
-        );
-
-        // 3️⃣ Complete payment (opsiyonel: frontend tetikleyebilir)
-        await fetch(`${backendUrl}/complete_payment`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ paymentId: data.paymentId, txid: "USER_TX_ID" }),
-        });
-      } else {
-        alert(`Hata: ${data.error}`);
+      const verifyData = await verifyRes.json();
+      if (!verifyData?.success) {
+        alert("Kullanıcı doğrulanamadı!");
+        return;
       }
+
+      const userId = verifyData.user.uid;
+
+      // ✅ Ödeme başlat
+      (window as any).Pi.createPayment(
+        {
+          amount,
+          memo: "PiHealth360 Ödemesi",
+          metadata: { receiver: receiver || "TestReceiver", userId },
+        },
+        {
+          // Onay için backend
+          onReadyForServerApproval: async (paymentId: string) => {
+            console.log("Backend approve çağrılıyor:", paymentId);
+            await fetch(`${backendUrl}/approve`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ paymentId }),
+              credentials: "include", // session cookie gönderimi
+            });
+          },
+
+          // Tamamlama için backend
+          onReadyForServerCompletion: async (paymentId: string, txid: string) => {
+            console.log("Backend complete çağrılıyor:", paymentId, txid);
+            await fetch(`${backendUrl}/complete`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ paymentId, txid }),
+              credentials: "include",
+            });
+          },
+
+          onCancel: (paymentId: string) => {
+            console.log("Ödeme iptal edildi:", paymentId);
+          },
+
+          onError: (error: any, paymentId: string) => {
+            console.error("Ödeme hatası:", error, paymentId);
+            alert("Ödeme sırasında hata oluştu: " + error?.message);
+          },
+        }
+      );
     } catch (err) {
+      console.error("Payment error:", err);
       alert("Sunucu hatası: " + (err as Error).message);
     } finally {
       setLoading(false);

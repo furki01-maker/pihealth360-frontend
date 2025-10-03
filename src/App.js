@@ -7,12 +7,22 @@ const App = () => {
   return (
     <div
       className="App"
-      style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center", padding: "20px" }}
+      style={{
+        maxWidth: "800px",
+        margin: "0 auto",
+        textAlign: "center",
+        padding: "20px",
+      }}
     >
       <h1>My React Editor & Pi Payment</h1>
       <MyEditor />
       <div style={{ marginTop: "30px" }}>
-        <PaymentButton amount={1} receiver="TestReceiver" />
+        {/* ✅ Backend URL eklenmeli */}
+        <PaymentButton
+          amount={1}
+          receiver="TestReceiver"
+          backendUrl="https://pihealth360-backend-v2.fly.dev"
+        />
       </div>
     </div>
   );
